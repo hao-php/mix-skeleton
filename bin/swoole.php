@@ -31,8 +31,7 @@ $http->on('Request', $vega->handler());
 $http->on('WorkerStart', function ($server, $workerId) {
     // swoole 协程不支持 set_exception_handler 需要手动捕获异常
     try {
-        App\Container\DB::enableCoroutine();
-        App\Container\RDS::enableCoroutine();
+        \Swoole\Runtime::enableCoroutine();
     } catch (\Throwable $ex) {
         Error::handle($ex);
     }

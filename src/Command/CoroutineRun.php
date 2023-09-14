@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Lib\Cli\BaseRun;
+use App\Common\Cli\BaseRun;
 
 class CoroutineRun extends BaseRun
 {

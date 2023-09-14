@@ -19,8 +19,7 @@ Error::register();
 Logger::instance()->useLoggingLoopDetection(false); // 协程专用
 
 Swoole\Coroutine\run(function () {
-    App\Container\DB::enableCoroutine();
-    App\Container\RDS::enableCoroutine();
+    \Swoole\Runtime::enableCoroutine();
 
     $vega = Vega::new();
     $host = '0.0.0.0';

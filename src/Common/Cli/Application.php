@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Lib\Cli;
+namespace App\Common\Cli;
 
 use Mix\Cli\Argv;
 use Mix\Cli\Exception\NotFoundException;

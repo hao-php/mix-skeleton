@@ -64,4 +64,12 @@ class Once
         return false;
     }
 
+    public function reset()
+    {
+        $this->executed = false;
+        if (isset($this->chan)) {
+            $this->chan->push(true);
+        }
+    }
+
 }

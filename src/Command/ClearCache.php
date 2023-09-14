@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Lib\Cli\BaseRun;
+use App\Common\Cli\BaseRun;
 use Mix\Cli\Flag;
 
 /**

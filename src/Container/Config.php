@@ -36,7 +36,13 @@ class Config
     {
         if (!isset(self::$instance)) {
             self::$once->do(function () {
-                self::$instance = new \Noodlehaus\Config(__DIR__ . '/../../conf');
+                try {
+                    self::$instance = new \Noodlehaus\Config(__DIR__ . '/../../conf');
+                } catch (\Throwable $e) {
+                    self::$instance = null;
+                    static::$once->reset();
+                    throw $e;
+                }
             });
         }
         return self::$instance;
