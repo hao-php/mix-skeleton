@@ -17,8 +17,6 @@ Error::register();
 
 Cli::init();
 
-Cli::setName('app')->setVersion('0.0.0-alpha');
-
 // 使用字符串动态加载类
 $cmds = [
     [

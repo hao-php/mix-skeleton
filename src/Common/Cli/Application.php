@@ -2,22 +2,31 @@
 
 namespace App\Common\Cli;
 
-use Mix\Cli\Argv;
-use Mix\Cli\Exception\NotFoundException;
-use Mix\Cli\Flag;
+
+use App\Common\Cli\Exception\NotFoundException;
 
 /**
  * Class Application
  * @package Mix\Cli
  */
-class Application extends \Mix\Cli\Application
+class Application
 {
+
+    public string $basePath = '';
 
     /**
      * @var array [][]
      */
     protected $arrCommands = [];
 
+
+    public function __construct()
+    {
+        Argv::parse();
+        Flag::parse();
+
+        $this->basePath = Argv::program()->dir;
+    }
 
     /**
      * @return $this
@@ -51,16 +60,9 @@ class Application extends \Mix\Cli\Application
                     $this->globalHelp();
                     return;
                 }
-                if (Flag::match('v', 'version')->bool()) {
-                    $this->version();
-                    return;
-                }
                 $options = Flag::options();
                 if (empty($options)) {
                     $this->globalHelp();
-                    return;
-                } elseif ($this->singleton) {
-                    $this->call();
                     return;
                 }
                 $keys = array_keys($options);
@@ -81,13 +83,13 @@ class Application extends \Mix\Cli\Application
     protected function globalHelp(): void
     {
         $script = Argv::program()->path;
-        static::println("Usage: {$script}" . ($this->singleton ? '' : ' [OPTIONS] COMMAND') . " [ARG...]");
+        static::println("Usage: {$script}" . ' COMMAND [OPTIONS]' . " [ARG...]");
         $this->printArrCommands();
         $this->printGlobalOptions();
         static::println('');
-        static::println("Run '{$script}" . ($this->singleton ? '' : ' COMMAND') . " --help' for more information on a command.");
+        static::println("Run '{$script}" . ' COMMAND' . " --help' for more information on a command.");
         static::println('');
-        static::println("Developed with Mix PHP framework. (openmix.org/mix-php)");
+//        static::println("Developed with Mix PHP framework. (openmix.org/mix-php)");
     }
 
     protected function arrCommandHelp(): void
@@ -100,7 +102,7 @@ class Application extends \Mix\Cli\Application
         }
         $this->printCommandOptions();
         static::println('');
-        static::println("Developed with Mix PHP framework. (openmix.org/mix-php)");
+//        static::println("Developed with Mix PHP framework. (openmix.org/mix-php)");
     }
 
     protected function printGlobalOptions(): void
@@ -109,7 +111,7 @@ class Application extends \Mix\Cli\Application
         static::println('');
         static::println('Global Options:');
         static::println("  -h, --help{$tabs}Print usage");
-        static::println("  -v, --version{$tabs}Print version information");
+//        static::println("  -v, --version{$tabs}Print version information");
     }
 
     protected function printArrCommands(): void
@@ -211,7 +213,6 @@ class Application extends \Mix\Cli\Application
         $cmdHandler = $this->makeCmdHandler($cmd);
 
         $this->arrValidateOptions($cmdHandler);
-
 
         $cmdHandler->main();
     }

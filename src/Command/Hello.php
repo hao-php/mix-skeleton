@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Common\Cli\BaseRun;
 use Mix\Cli\Flag;
 use Mix\Cli\Option;
+use Swoole\Coroutine;
 
 /**
  * @package App\Command
@@ -22,10 +23,15 @@ class Hello extends BaseRun
         ];
     }
 
-    public function main(): void
+    /**
+     * @example php bin/cli.php -n=name
+     */
+    public function handle(): void
     {
-        $name = Flag::match('n', 'name')->string();
-        print "hello, {$name}\n";
+        var_dump(1 / 3);
+        $name = Flag::match('n', 'name')->string('default');
+        $cid = Coroutine::getCid();
+        print "hello, {$name}, cid:{$cid} \n";
     }
 
 }

@@ -5,7 +5,7 @@ namespace App\Common\Cli;
 /**
  * Class Cli
  */
-class Cli extends \Mix\Cli\Cli
+class Cli
 {
 
     /**
@@ -21,7 +21,7 @@ class Cli extends \Mix\Cli\Cli
         if (PHP_SAPI != 'cli') {
             return;
         }
-        static::$app = new Application('app', '0.0.0');
+        static::$app = new Application();
     }
 
     /**
