@@ -1,21 +1,19 @@
 <?php
 
-namespace App\Common\Cli;
+namespace App\Command;
 
-use Mix\Cli\RunInterface;
+use Haoa\Cli\BaseRun;
 use function Swoole\Coroutine\run;
 
-abstract class BaseRun implements RunInterface
+abstract class BaseCommand extends BaseRun
 {
 
     /** @var bool 是否在协程环境中执行脚本 */
     protected bool $coroutine = true;
 
-    public array $options = [];
-
     abstract function handle(): void;
 
-    public function main(): void
+    function main(): void
     {
         if (!$this->coroutine) {
             $this->handle();
@@ -23,8 +21,8 @@ abstract class BaseRun implements RunInterface
         }
 
         run(function () {
+            \Swoole\Runtime::enableCoroutine();
             $this->handle();
         });
     }
-
 }

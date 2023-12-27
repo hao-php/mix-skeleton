@@ -8,7 +8,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use App\Error;
 use Dotenv\Dotenv;
-use \App\Common\Cli\Cli;
+use Haoa\Cli\Cli;
 
 Dotenv::createUnsafeImmutable(__DIR__ . '/../', '.env')->load();
 define("APP_DEBUG", env('APP_DEBUG'));

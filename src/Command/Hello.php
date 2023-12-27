@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\Common\Cli\BaseRun;
 use Mix\Cli\Flag;
 use Mix\Cli\Option;
 use Swoole\Coroutine;
@@ -10,7 +9,7 @@ use Swoole\Coroutine;
 /**
  * @package App\Command
  */
-class Hello extends BaseRun
+class Hello extends BaseCommand
 {
 
     public function __construct()
@@ -28,7 +27,6 @@ class Hello extends BaseRun
      */
     public function handle(): void
     {
-        var_dump(1 / 3);
         $name = Flag::match('n', 'name')->string('default');
         $cid = Coroutine::getCid();
         print "hello, {$name}, cid:{$cid} \n";

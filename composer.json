@@ -47,7 +47,8 @@
     "vlucas/phpdotenv": "^5.3",
     "hassankhan/config": "^3.0",
     "monolog/monolog": "^3.1",
-    "firebase/php-jwt": "^5.4"
+    "firebase/php-jwt": "^5.4",
+    "haoa/cli": "^1.0"
   },
   "require-dev": {
     "swoole/ide-helper": "^4.6"
