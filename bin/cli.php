@@ -23,6 +23,12 @@ $cmds = [
         'name' => 'hello',
         'short' => 'hello',
         'class' => 'App\Command\Hello',
+    ],
+    [
+        'name' => 'test',
+        'short' => '',
+        'class' => 'App\Command\Test',
     ]
 ];
+
 Cli::addArrCommand(...$cmds)->run();

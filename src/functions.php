@@ -36,3 +36,14 @@ if (!function_exists('env')) {
         return $value;
     }
 }
+
+/**
+ * 获取配置
+ * @param $key
+ * @param $default
+ * @return mixed
+ */
+function config($key, $default = null)
+{
+    return \App\Container\Config::instance()->get($key, $default);
+}

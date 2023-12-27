@@ -2,11 +2,14 @@
 
 namespace App\Container;
 
+use App\Lib\App\Monolog\RequestIdProcessor;
 use App\Once;
-use Monolog\Formatter\LineFormatter;
+use Haoa\Util\Util;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Level;
 use Monolog\LogRecord;
+use Monolog\Processor\IntrospectionProcessor;
 
 /**
  * Class Logger
@@ -42,8 +45,15 @@ class Logger implements HandlerInterface
             try {
                 static::$once->do(function () {
                     $logger = new \Monolog\Logger('MIX');
-                    $rotatingFileHandler = new RotatingFileHandler(__DIR__ . '/../../runtime/logs/mix.log', 7);
-                    $rotatingFileHandler->setFormatter(new LineFormatter("[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n", 'Y-m-d H:i:s.u'));
+                    if (Util::isCoroutine()) {
+                        $logger->useLoggingLoopDetection(false); // 协程专用
+                    }
+                    $level = APP_DEBUG ? Level::Debug : Level::Info;
+                    $extension = config('logger.file_extension') ?? 'log';
+                    $rotatingFileHandler = new RotatingFileHandler(__DIR__ . "/../../runtime/logs/mix." . $extension, 7, $level);
+                    $rotatingFileHandler->setFormatter(config('logger.formatter'));
+                    $rotatingFileHandler->pushProcessor(new IntrospectionProcessor());
+//                    $rotatingFileHandler->pushProcessor(new RequestIdProcessor());
                     $logger->pushHandler($rotatingFileHandler);
                     $logger->pushHandler(new Logger());
                     self::$instance = $logger;
@@ -64,9 +74,9 @@ class Logger implements HandlerInterface
     public function isHandling(LogRecord $record): bool
     {
         if (APP_DEBUG) {
-            return $record->level->toRFC5424Level() >= \Monolog\Level::Debug;
+            return $record->level->toRFC5424Level() >= Level::Debug;
         }
-        return $record->level->toRFC5424Level() >= \Monolog\Level::Info;
+        return $record->level->toRFC5424Level() >= Level::Info;
     }
 
     /**

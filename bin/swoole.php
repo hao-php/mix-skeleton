@@ -16,7 +16,6 @@ Dotenv::createUnsafeImmutable(__DIR__ . '/../', '.env')->load();
 define("APP_DEBUG", env('APP_DEBUG'));
 
 Error::register();
-Logger::instance()->useLoggingLoopDetection(false); // 协程专用
 
 /**
  * 多进程默认开启了协程
@@ -26,19 +25,48 @@ Logger::instance()->useLoggingLoopDetection(false); // 协程专用
 $vega = Vega::new();
 $host = '0.0.0.0';
 $port = 9501;
-$http = new Swoole\Http\Server($host, $port);
+$http = new Swoole\Http\Server($host, $port, SWOOLE_PROCESS); // SWOOLE_PROCESS | SWOOLE_BASE
+$file = __FILE__;
 $http->on('Request', $vega->handler());
-$http->on('WorkerStart', function ($server, $workerId) {
-    // swoole 协程不支持 set_exception_handler 需要手动捕获异常
+
+$http->on('Start', function () use ($file) {
     try {
-        \Swoole\Runtime::enableCoroutine();
+        swoole_set_process_name("php {$file} master");
     } catch (\Throwable $ex) {
         Error::handle($ex);
     }
 });
+
+$http->on('ManagerStart', function () use ($file) {
+    try {
+        swoole_set_process_name("php {$file} manager");
+    } catch (\Throwable $ex) {
+        Error::handle($ex);
+    }
+});
+
+$http->on('WorkerStart', function ($server, $workerId) use ($file) {
+    // swoole 协程不支持 set_exception_handler 需要手动捕获异常
+    try {
+        \Swoole\Runtime::enableCoroutine(); // hook all
+        swoole_set_process_name("php {$file} worker");
+    } catch (\Throwable $ex) {
+        Error::handle($ex);
+    }
+});
+
+$workerNum = swoole_cpu_num();
 $http->set([
     'enable_coroutine' => true,
-    'worker_num' => 4,
+    'worker_num' => $workerNum,
+    'max_request'   => 100000,
+    'max_wait_time' => 30,
+    'socket_dns_timeout' => 10,
+    'socket_connect_timeout' => 10,
+    'socket_write_timeout' => 60,
+    'socket_read_timeout' => 60,
+    'max_coroutine' => 100000,
+    'enable_deadlock_check' => true,
 ]);
 
 echo <<<EOL
@@ -54,7 +82,9 @@ EOL;
 printf("System    Name:       %s\n", strtolower(PHP_OS));
 printf("PHP       Version:    %s\n", PHP_VERSION);
 printf("Swoole    Version:    %s\n", swoole_version());
+printf("Swoole    WorkerNum:  %s\n", $workerNum);
 printf("Listen    Addr:       http://%s:%d\n", $host, $port);
+printf("App       Debug:      %s\n", env("APP_DEBUG") ? 'true' : 'false');
 Logger::instance()->info('Start swoole server');
 
 $http->start();

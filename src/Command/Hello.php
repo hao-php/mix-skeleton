@@ -2,8 +2,7 @@
 
 namespace App\Command;
 
-use Mix\Cli\Flag;
-use Mix\Cli\Option;
+use Haoa\Cli\Option;
 use Swoole\Coroutine;
 
 /**
@@ -23,11 +22,14 @@ class Hello extends BaseCommand
     }
 
     /**
-     * @example php bin/cli.php -n=name
+     * @example php bin/cli.php hello arg1 arg2 -n=name
      */
     public function handle(): void
     {
-        $name = Flag::match('n', 'name')->string('default');
+        $name = $this->optMatch('n', 'name')->string('default');
+        $options = $this->arg()->array();
+        var_dump($options);
+
         $cid = Coroutine::getCid();
         print "hello, {$name}, cid:{$cid} \n";
     }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Mix\Vega\Context;
+use Swoole\Coroutine;
 
 class Hello
 {

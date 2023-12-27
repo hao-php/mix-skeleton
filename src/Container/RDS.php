@@ -3,6 +3,7 @@
 namespace App\Container;
 
 use App\Once;
+use Haoa\Util\Util;
 use Mix\Redis\Redis;
 
 class RDS
@@ -42,11 +43,13 @@ class RDS
                     APP_DEBUG and $rds->setLogger(new RDSLogger());
                     self::$instance = $rds;
 
-                    $maxOpen = 30;        // 最大开启连接数
-                    $maxIdle = 10;        // 最大闲置连接数
-                    $maxLifetime = 3600;  // 连接的最长生命周期
-                    $waitTimeout = 0.0;   // 从池获取连接等待的时间, 0为一直等待
-                    self::$instance->startPool($maxOpen, $maxIdle, $maxLifetime, $waitTimeout);
+                    if (Util::isCoroutine()) {
+                        $maxOpen = 100;        // 最大开启连接数
+                        $maxIdle = 10;        // 最大闲置连接数
+                        $maxLifetime = 3600;  // 连接的最长生命周期
+                        $waitTimeout = 10;   // 从池获取连接等待的时间, 0为一直等待
+                        self::$instance->startPool($maxOpen, $maxIdle, $maxLifetime, $waitTimeout);
+                    }
                 });
             } catch (\Throwable $e) {
                 self::$instance = null;
