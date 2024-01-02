@@ -2,7 +2,8 @@
 
 namespace App\Container;
 
-use App\Lib\App\Monolog\RequestIdProcessor;
+use App\Common\Context\ContextConst;
+use App\Lib\App\Monolog\TraceIdProcessor;
 use App\Once;
 use Haoa\Util\Util;
 use Monolog\Handler\HandlerInterface;
@@ -53,7 +54,15 @@ class Logger implements HandlerInterface
                     $rotatingFileHandler = new RotatingFileHandler(__DIR__ . "/../../runtime/logs/mix." . $extension, 7, $level);
                     $rotatingFileHandler->setFormatter(config('logger.formatter'));
                     $rotatingFileHandler->pushProcessor(new IntrospectionProcessor());
-//                    $rotatingFileHandler->pushProcessor(new RequestIdProcessor());
+                    $rotatingFileHandler->pushProcessor(function ($record) {
+                        $traceId = RunContext::instance()->get(ContextConst::KEY_LOG_TRACE_ID);
+                        if (!empty($traceId)) {
+                            $record->extra['traceId'] = $traceId;
+                        }
+                        $record->extra['cid'] = \Swoole\Coroutine::getCid();
+
+                        return $record;
+                    });
                     $logger->pushHandler($rotatingFileHandler);
                     $logger->pushHandler(new Logger());
                     self::$instance = $logger;

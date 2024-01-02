@@ -2,6 +2,9 @@
 
 namespace App\Command;
 
+use App\Common\Context\ContextConst;
+use App\Container\RunContext;
+use Co\Context;
 use Haoa\Cli\Arguments;
 use Haoa\Cli\BaseRun;
 use Haoa\Cli\Flag;
@@ -16,25 +19,32 @@ abstract class BaseCommand extends BaseRun
 
     abstract function handle(): void;
 
-    public function optMatch(string ...$name): FlagValue
+    protected function optMatch(string ...$name): FlagValue
     {
         return Flag::match(...$name);
     }
 
-    public function arg(): Arguments
+    protected function arg(): Arguments
     {
         return Flag::arguments();
+    }
+
+    protected function buildTraceId()
+    {
+        return "cli_" . session_create_id();
     }
 
     function main(): void
     {
         if (!$this->coroutine) {
+            RunContext::instance()->set(ContextConst::KEY_LOG_TRACE_ID, $this->buildTraceId());
             $this->handle();
             return;
         }
 
         run(function () {
             \Swoole\Runtime::enableCoroutine();
+            RunContext::instance()->set(ContextConst::KEY_LOG_TRACE_ID, $this->buildTraceId());
             $this->handle();
         });
     }
