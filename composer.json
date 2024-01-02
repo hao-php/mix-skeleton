@@ -49,7 +49,8 @@
     "monolog/monolog": "^3.1",
     "firebase/php-jwt": "^5.4",
     "haoa/cli": "^1.0",
-    "haoa/util": "^1.0"
+    "haoa/util": "^1.0",
+    "haoa/mix-ext": "^1.0"
   },
   "require-dev": {
     "swoole/ide-helper": "^4.6"
