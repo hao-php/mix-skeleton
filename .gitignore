@@ -25,4 +25,5 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
+.env
 src/Command/Test.php
