@@ -10,5 +10,6 @@ return [
             'file_extension' => 'log',
 //            'formatter' => new \Monolog\Formatter\JsonFormatter(),
 //            'file_extension' => 'json',
+            'backtrace_level' => \Monolog\Level::Info,
         ],
 ];

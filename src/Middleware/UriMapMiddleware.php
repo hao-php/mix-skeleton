@@ -2,7 +2,7 @@
 
 namespace App\Middleware;
 
-use App\Common\Context\ContextConst;
+use App\Common\Const\VegaContextConst;
 use App\Container\Logger;
 use Mix\Vega\Context;
 use Mix\Vega\Exception\NotFoundException;
@@ -21,7 +21,7 @@ class UriMapMiddleware
             $dir = ucfirst($ctx->param('dir'));
             $controller = ucfirst($ctx->param('controller')) ?: 'Index';
             $action = ucfirst($ctx->param('action'));
-            var_dump($controller, $action);
+            var_dump($ctx->uri()->getPath());
 
             $controllerPath = "App\\Controller\\{$dir}\\{$controller}Controller";
 
@@ -35,7 +35,7 @@ class UriMapMiddleware
                 $controllerObj = new $controllerPath;
             }
 
-            $ctx->set(ContextConst::HTTP_CONTROLLER_OBJ, $controllerObj);
+            $ctx->set(VegaContextConst::HTTP_CONTROLLER_OBJ, $controllerObj);
 //            $ctx->set(ContextConst::ACTION_PATH, strtolower("{$module}/{$dir}/{$controller}/{$action}"));
 //            Logger::instance()->debug(sprintf("action_path %s", $ctx->get(ContextConst::ACTION_PATH)));
 
@@ -44,7 +44,7 @@ class UriMapMiddleware
                 throw new NotFoundException();
             }
 
-            $ctx->set(ContextConst::HTTP_ACTION_NAME, $action);
+            $ctx->set(VegaContextConst::HTTP_ACTION_NAME, $action);
 
             $ctx->next();
         };

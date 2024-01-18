@@ -14,11 +14,9 @@ return function (Mix\Vega\Engine $vega) {
 
     $vega->handle('/{dir}/{controller}/{action}',
         UriMapMiddleware::callback('api'),
-        // AuthMiddleware::callback(),
         [new Dispatch(), 'run'])->methods('GET', 'POST', 'OPTIONS');
 
     $vega->handle('/{dir}/{action}',
         UriMapMiddleware::callback('api'),
-        // AuthMiddleware::callback(),
         [new Dispatch(), 'run'])->methods('GET', 'POST', 'OPTIONS');
 };

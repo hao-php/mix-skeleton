@@ -2,9 +2,9 @@
 
 namespace App\Container;
 
-use App\Common\Context\ContextConst;
-use App\Lib\App\Monolog\TraceIdProcessor;
+use App\Common\Const\RunContextConst;
 use App\Once;
+use Haoa\Util\Context\RunContext;
 use Haoa\Util\Util;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
@@ -53,13 +53,36 @@ class Logger implements HandlerInterface
                     $extension = config('logger.file_extension') ?? 'log';
                     $rotatingFileHandler = new RotatingFileHandler(__DIR__ . "/../../runtime/logs/mix." . $extension, 7, $level);
                     $rotatingFileHandler->setFormatter(config('logger.formatter'));
-                    $rotatingFileHandler->pushProcessor(new IntrospectionProcessor());
-                    $rotatingFileHandler->pushProcessor(function ($record) {
-                        $traceId = RunContext::instance()->get(ContextConst::KEY_LOG_TRACE_ID);
+//                    $rotatingFileHandler->pushProcessor(new IntrospectionProcessor());
+                    $rotatingFileHandler->pushProcessor(function (LogRecord $record) {
+                        $traceId = RunContext::get(RunContextConst::LOG_TRACE_ID);
                         if (!empty($traceId)) {
-                            $record->extra['traceId'] = $traceId;
+                            $record->extra['trace_id'] = $traceId;
                         }
                         $record->extra['cid'] = \Swoole\Coroutine::getCid();
+
+                        /** @var Level $backtraceLevel */
+                        $backtraceLevel = config('logger.backtrace_level');
+                        if ($backtraceLevel && $record->level->value >= $backtraceLevel->value) {
+                            $debug = debug_backtrace(2);
+                            if (!empty($debug)) {
+                                $backtrace = [];
+                                foreach ($debug as $v) {
+                                    if (!isset($v['file'])) {
+                                        continue;
+                                    }
+                                    if (str_contains($v['file'], 'Common/Log/LoggerHelper.php')) {
+                                        continue;
+                                    }
+                                    if (str_contains($v['file'], '/vendor/')) {
+                                        continue;
+                                    }
+                                    $backtrace[] = $v['file'] . ':' . $v['line'];
+                                    break;
+                                }
+                                $record->extra['backtrace'] = $backtrace;
+                            }
+                        }
 
                         return $record;
                     });
@@ -83,9 +106,9 @@ class Logger implements HandlerInterface
     public function isHandling(LogRecord $record): bool
     {
         if (APP_DEBUG) {
-            return $record->level->toRFC5424Level() >= Level::Debug;
+            return $record->level->value >= Level::Debug->value;
         }
-        return $record->level->toRFC5424Level() >= Level::Info;
+        return $record->level->value >= Level::Info->value;
     }
 
     /**
@@ -94,6 +117,9 @@ class Logger implements HandlerInterface
      */
     public function handle(LogRecord $record): bool
     {
+        if (!$this->isHandling($record)) {
+            return false;
+        }
         $message = sprintf("%s  %s  %s\n", $record->datetime->format('Y-m-d H:i:s.u'), $record->level->toPsrLogLevel(), $record->message);
         switch (PHP_SAPI) {
             case 'cli':

@@ -2,13 +2,12 @@
 
 namespace App\Command;
 
-use App\Common\Context\ContextConst;
-use App\Container\RunContext;
-use Co\Context;
+use App\Common\Const\RunContextConst;
 use Haoa\Cli\Arguments;
 use Haoa\Cli\BaseRun;
 use Haoa\Cli\Flag;
 use Haoa\Cli\FlagValue;
+use Haoa\Util\Context\RunContext;
 use function Swoole\Coroutine\run;
 
 abstract class BaseCommand extends BaseRun
@@ -37,14 +36,14 @@ abstract class BaseCommand extends BaseRun
     function main(): void
     {
         if (!$this->coroutine) {
-            RunContext::instance()->set(ContextConst::KEY_LOG_TRACE_ID, $this->buildTraceId());
+            RunContext::set(RunContextConst::LOG_TRACE_ID, $this->buildTraceId());
             $this->handle();
             return;
         }
 
         run(function () {
             \Swoole\Runtime::enableCoroutine();
-            RunContext::instance()->set(ContextConst::KEY_LOG_TRACE_ID, $this->buildTraceId());
+            RunContext::set(RunContextConst::LOG_TRACE_ID, $this->buildTraceId());
             $this->handle();
         });
     }
