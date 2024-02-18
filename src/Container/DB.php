@@ -4,7 +4,7 @@ namespace App\Container;
 
 use App\Once;
 use Haoa\Util\Util;
-use Mix\Database\Database;
+use Haoa\MixExt\Db\Database;
 
 class DB
 {
@@ -40,6 +40,7 @@ class DB
                     $password = $_ENV['DATABASE_PASSWORD'];
                     $db = new Database($dsn, $username, $password, [
                         \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                        \PDO::ATTR_TIMEOUT => 30,
                         // \PDO::ATTR_EMULATE_PREPARES => false
                     ]);
                     APP_DEBUG and $db->setLogger(new DBLogger());
