@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use App\Common\Http\ResponseHelper;
 use Mix\Vega\Context;
-use Swoole\Coroutine;
 
 class Hello
 {
@@ -13,7 +13,7 @@ class Hello
      */
     public function index(Context $ctx)
     {
-        $ctx->string(200, 'hello, world!');
+        ResponseHelper::stringSuccess($ctx, 'hello, world!');
     }
 
 }

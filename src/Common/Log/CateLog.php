@@ -11,7 +11,7 @@ use App\Container\Logger;
  * @method static warning(string|\Stringable $message, array $context = [], string $cate = '')
  * @method static error(string|\Stringable $message, array $context = [], string $cate = '')
  */
-class LoggerHelper
+class CateLog
 {
 
     public static function __callStatic($name, $arguments)

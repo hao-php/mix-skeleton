@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Common\Http;
 
 use App\Common\Const\VegaContextConst;
-use App\Container\Logger;
 use Mix\Vega\Context;
 
 class ResponseHelper

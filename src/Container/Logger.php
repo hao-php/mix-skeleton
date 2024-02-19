@@ -71,7 +71,7 @@ class Logger implements HandlerInterface
                                     if (!isset($v['file'])) {
                                         continue;
                                     }
-                                    if (str_contains($v['file'], 'Common/Log/LoggerHelper.php')) {
+                                    if (str_contains($v['file'], 'Common/Log/CateLog.php')) {
                                         continue;
                                     }
                                     if (str_contains($v['file'], '/vendor/')) {

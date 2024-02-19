@@ -13,10 +13,10 @@ return function (Mix\Vega\Engine $vega) {
     $vega->handle('/auth', [new Auth(), 'index'])->methods('GET');
 
     $vega->handle('/{dir}/{controller}/{action}',
-        UriMapMiddleware::callback('api'),
+        UriMapMiddleware::callback(),
         [new Dispatch(), 'run'])->methods('GET', 'POST', 'OPTIONS');
 
     $vega->handle('/{dir}/{action}',
-        UriMapMiddleware::callback('api'),
+        UriMapMiddleware::callback(),
         [new Dispatch(), 'run'])->methods('GET', 'POST', 'OPTIONS');
 };

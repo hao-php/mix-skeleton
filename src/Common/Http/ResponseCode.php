@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Controller;
-
-use Mix\Vega\Context;
+namespace App\Common\Http;
 
 class ResponseCode
 {

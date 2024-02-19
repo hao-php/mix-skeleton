@@ -2,7 +2,7 @@
 
 namespace App\Controller\User;
 
-use App\Controller\ResponseHelper;
+use App\Common\Http\ResponseHelper;
 use Mix\Vega\Context;
 
 class IndexController

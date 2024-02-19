@@ -2,16 +2,27 @@
 
 namespace App\Model;
 
-use App\Container\DB;
-
 class UserModel extends BaseModel
 {
 
     public string $table = "user";
 
-    public function __construct()
+    protected string $updateTimeField = 'created_at';
+
+    protected string $createTimeField = 'updated_at';
+
+    protected function buildCreateTime()
     {
-        $this->database = DB::instance();
+        return date('Y-m-d H:i:s');
+    }
+
+    protected function buildUpdateTime($time = null)
+    {
+        // 创建的时候, 修改时间使用创建时间
+        if (!empty($time)) {
+            return $time;
+        }
+        return date('Y-m-d H:i:s');
     }
 
 
